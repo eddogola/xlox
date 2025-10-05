@@ -1,0 +1,7 @@
+dump.txt
+
+# output binaries
+*.out
+
+# idk what this is
+*.gch

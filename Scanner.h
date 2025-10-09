@@ -3,6 +3,7 @@
 #include "Token.h"
 
 #include <cwctype>
+#include <optional>
 #include <deque>
 #include <string>
 
@@ -23,10 +24,15 @@ public:
   scanTokens(); // TODO: update return type from void to a set of tokens?
 
 private:
+  void scanToken_();
+  char advance_();
+  void addToken_(TokenType tokenType);
+  void addToken_(TokenType tokenType, std::optional<std::string> literal);
+
   std::string sourceText_;
   int line_;
-  int startColumn_;          // start of token
-  int currentColumn;         // within token
+  int startIndex_;          // start of token
+  int currentIndex_;         // within token
   std::deque<Token> tokens_; // use deque for fast(O(1)) insertion + deletion
 };
 

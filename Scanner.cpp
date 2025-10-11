@@ -14,7 +14,12 @@ namespace xlox {
 
 Scanner::Scanner(std::string sourceText)
     : sourceText_(sourceText), line_(1), startIndex_(0), currentIndex_(0),
-      tokens_({}) {}
+      hadError(false), tokens_({}) {}
+
+void Scanner::error(std::string message, int line) {
+  std::cerr << std::format("Line {}: {}", line_, message);
+  hadError = true;
+}
 
 Scanner::~Scanner() {}
 
@@ -93,8 +98,8 @@ void Scanner::scanToken_() {
     line_++;
     break;
   default:
-    throw Exception(
-        std::format("Line {}: Token '{}' could not be processed", line_, c));
+    std::string message = std::format("Token '{}' could not be processed", c));
+    error(message, line);
     break;
   }
 }

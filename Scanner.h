@@ -12,6 +12,7 @@ namespace xlox {
 class Scanner {
 public:
   Scanner(std::string source);
+  void error(std::string message, int line);
   ~Scanner();
 
   /**
@@ -31,8 +32,9 @@ private:
 
   std::string sourceText_;
   int line_;
-  int startIndex_;           // start of token
-  int currentIndex_;         // within token
+  int startIndex_;   // start of token
+  int currentIndex_; // within token
+  bool hadError;
   std::deque<Token> tokens_; // use deque for fast(O(1)) insertion + deletion
 };
 

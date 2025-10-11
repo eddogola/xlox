@@ -17,7 +17,7 @@ Scanner::Scanner(std::string sourceText)
       hadError(false), tokens_({}) {}
 
 void Scanner::error(std::string message, int line) {
-  std::cerr << std::format("Line {}: {}", line_, message);
+  std::cerr << std::format("Line {}: {}", line, message) << std::endl;
   hadError = true;
 }
 
@@ -35,7 +35,7 @@ Scanner Scanner::buildFromSourceFile(std::string sourceFileName) {
 
     return Scanner(contents);
   }
-  throw std::runtime_error("Error opening source file: " + sourceFileName);
+  throw Exception("Error opening source file: " + sourceFileName);
 }
 
 std::string Scanner::getSourceText() { return sourceText_; }
@@ -98,8 +98,8 @@ void Scanner::scanToken_() {
     line_++;
     break;
   default:
-    std::string message = std::format("Token '{}' could not be processed", c));
-    error(message, line);
+    std::string message = std::format("Token '{}' could not be processed", c);
+    error(message, line_);
     break;
   }
 }

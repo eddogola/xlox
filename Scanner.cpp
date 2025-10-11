@@ -1,7 +1,9 @@
 #include "Scanner.h"
+#include "Exception.h"
 #include "Token.h"
 
 #include <deque>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <optional>
@@ -89,6 +91,10 @@ void Scanner::scanToken_() {
     break;
   case '\n':
     line_++;
+    break;
+  default:
+    throw Exception(
+        std::format("Line {}: Token '{}' could not be processed", line_, c));
     break;
   }
 }

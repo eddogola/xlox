@@ -2,9 +2,10 @@
 #include "Token.h"
 
 #include <deque>
-#include <optional>
 #include <fstream>
 #include <iostream>
+#include <optional>
+#include <stdexcept>
 #include <string>
 
 namespace xlox {
@@ -32,42 +33,70 @@ Scanner Scanner::buildFromSourceFile(std::string sourceFileName) {
 
 std::string Scanner::getSourceText() { return sourceText_; }
 
-char Scanner::advance_() {
-  return sourceText_[currentIndex_++];
-}
+char Scanner::advance_() { return sourceText_[currentIndex_++]; }
 
 void Scanner::addToken_(TokenType tokenType) {
   std::optional<std::string> noInput = std::nullopt;
   addToken_(tokenType, noInput);
 }
 
-void Scanner::addToken_(TokenType tokenType, std::optional<std::string> literal) {
+void Scanner::addToken_(TokenType tokenType,
+                        std::optional<std::string> maybeLiteral) {
   int lexemeLength = currentIndex_ - startIndex_;
-  [[maybe_unused]] std::string lexeme = sourceText_.substr(startIndex_, lexemeLength);
-  tokens_.push_back(Token(tokenType, literal.value(), line_, startIndex_));
+  [[maybe_unused]] std::string lexeme =
+      sourceText_.substr(startIndex_, lexemeLength);
+  if (maybeLiteral.has_value()) {
+    std::string literal = maybeLiteral.value();
+    tokens_.push_back(Token(tokenType, literal, line_, startIndex_));
+  } else {
+    tokens_.push_back(Token(tokenType, lexeme, line_, startIndex_));
+  }
 }
 
 void Scanner::scanToken_() {
   char c = advance_();
-  
+
   switch (c) {
-    case '(': addToken_(TokenType::LEFT_PAREN); break;
-    case ')': addToken_(TokenType::RIGHT_PAREN); break;
-    case '{': addToken_(TokenType::LEFT_BRACE); break;
-    case '}': addToken_(TokenType::RIGHT_BRACE); break;
-    case ',': addToken_(TokenType::COMMA); break;
-    case '.': addToken_(TokenType::DOT); break;
-    case '-': addToken_(TokenType::MINUS); break;
-    case '+': addToken_(TokenType::PLUS); break;
-    case ';': addToken_(TokenType::SEMICOLON); break;
-    case '*': addToken_(TokenType::STAR); break;
-    case '\n': line_++; break;
+  case '(':
+    addToken_(TokenType::LEFT_PAREN);
+    break;
+  case ')':
+    addToken_(TokenType::RIGHT_PAREN);
+    break;
+  case '{':
+    addToken_(TokenType::LEFT_BRACE);
+    break;
+  case '}':
+    addToken_(TokenType::RIGHT_BRACE);
+    break;
+  case ',':
+    addToken_(TokenType::COMMA);
+    break;
+  case '.':
+    addToken_(TokenType::DOT);
+    break;
+  case '-':
+    addToken_(TokenType::MINUS);
+    break;
+  case '+':
+    addToken_(TokenType::PLUS);
+    break;
+  case ';':
+    addToken_(TokenType::SEMICOLON);
+    break;
+  case '*':
+    addToken_(TokenType::STAR);
+    break;
+  case '\n':
+    line_++;
+    break;
   }
 }
 
 std::deque<Token> Scanner::scanTokens() {
 
-  while (!(currentIndex_ >= sourceText_.length())) {  // while not at the end of the source code
+  while (!(currentIndex_ >=
+           sourceText_.length())) { // while not at the end of the source code
     startIndex_ = currentIndex_;
     scanToken_();
   }

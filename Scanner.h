@@ -3,8 +3,8 @@
 #include "Token.h"
 
 #include <cwctype>
-#include <optional>
 #include <deque>
+#include <optional>
 #include <string>
 
 namespace xlox {
@@ -27,11 +27,11 @@ private:
   void scanToken_();
   char advance_();
   void addToken_(TokenType tokenType);
-  void addToken_(TokenType tokenType, std::optional<std::string> literal);
+  void addToken_(TokenType tokenType, std::optional<std::string> maybeLiteral);
 
   std::string sourceText_;
   int line_;
-  int startIndex_;          // start of token
+  int startIndex_;           // start of token
   int currentIndex_;         // within token
   std::deque<Token> tokens_; // use deque for fast(O(1)) insertion + deletion
 };

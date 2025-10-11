@@ -58,15 +58,15 @@ enum TokenType {
 
 extern std::map<std::string, TokenType> tokenStringToTokenType;
 
-struct Token {
+class Token {
 public:
-  Token(TokenType type, std::string lexeme, int line, int startColumn);
+  Token(TokenType type, std::string lexeme, int line, int startIndex_);
   std::string toString() const;
 
 private:
   [[maybe_unused]] TokenType type;
   std::string lexeme;
   int line;
-  int startColumn;
+  int startIndex_;
 };
 } // namespace xlox

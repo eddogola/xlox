@@ -4,6 +4,7 @@
 
 #include <cwctype>
 #include <deque>
+#include <optional>
 #include <string>
 
 namespace xlox {
@@ -11,6 +12,7 @@ namespace xlox {
 class Scanner {
 public:
   Scanner(std::string source);
+  void error(std::string message, int line);
   ~Scanner();
 
   /**
@@ -23,10 +25,16 @@ public:
   scanTokens(); // TODO: update return type from void to a set of tokens?
 
 private:
+  void scanToken_();
+  char advance_();
+  void addToken_(TokenType tokenType);
+  void addToken_(TokenType tokenType, std::optional<std::string> maybeLiteral);
+
   std::string sourceText_;
   int line_;
-  int startColumn_;          // start of token
-  int currentColumn;         // within token
+  int startIndex_;   // start of token
+  int currentIndex_; // within token
+  bool hadError;
   std::deque<Token> tokens_; // use deque for fast(O(1)) insertion + deletion
 };
 

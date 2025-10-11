@@ -1,6 +1,7 @@
 dump.txt
 
 # output binaries
+build/
 *.out
 
 # idk what this is

@@ -26,7 +26,9 @@ public:
 
 private:
   void scanToken_();
+  bool isAtEnd_();
   char advance_();
+  bool match_(char c);
   void addToken_(TokenType tokenType);
   void addToken_(TokenType tokenType, std::optional<std::string> maybeLiteral);
 

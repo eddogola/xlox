@@ -52,9 +52,7 @@ Token::Token(TokenType tokenType, std::string lexeme, int line, int startIndex_)
     : type(tokenType), lexeme(lexeme), line(line), startIndex_(startIndex_) {}
 
 std::string Token::toString() const {
-  // return type + "\"" + lexeme + "\"" + "at line " + std::to_string(line) +
-  // std::endl;
-  return "\"" + lexeme + "\"" + "at line " + std::to_string(line) +
+  return "\"" + lexeme + "\"" + " at line " + std::to_string(line) +
          " and column " + std::to_string(startIndex_) + "\n";
 }
 } // namespace xlox

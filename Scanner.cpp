@@ -9,6 +9,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <sys/wait.h>
 
 namespace xlox {
 
@@ -16,12 +17,12 @@ Scanner::Scanner(std::string sourceText)
     : sourceText_(sourceText), line_(1), startIndex_(0), currentIndex_(0),
       hadError(false), tokens_({}) {}
 
+Scanner::~Scanner() {}
+
 void Scanner::error(std::string message, int line) {
   std::cerr << std::format("Line {}: {}", line, message) << std::endl;
   hadError = true;
 }
-
-Scanner::~Scanner() {}
 
 Scanner Scanner::buildFromSourceFile(std::string sourceFileName) {
   std::ifstream fileStream(sourceFileName, std::ios::in | std::ios::binary);
@@ -40,24 +41,16 @@ Scanner Scanner::buildFromSourceFile(std::string sourceFileName) {
 
 std::string Scanner::getSourceText() { return sourceText_; }
 
-char Scanner::advance_() { return sourceText_[currentIndex_++]; }
+std::deque<Token> Scanner::scanTokens() {
 
-void Scanner::addToken_(TokenType tokenType) {
-  std::optional<std::string> noInput = std::nullopt;
-  addToken_(tokenType, noInput);
-}
-
-void Scanner::addToken_(TokenType tokenType,
-                        std::optional<std::string> maybeLiteral) {
-  int lexemeLength = currentIndex_ - startIndex_;
-  [[maybe_unused]] std::string lexeme =
-      sourceText_.substr(startIndex_, lexemeLength);
-  if (maybeLiteral.has_value()) {
-    std::string literal = maybeLiteral.value();
-    tokens_.push_back(Token(tokenType, literal, line_, startIndex_));
-  } else {
-    tokens_.push_back(Token(tokenType, lexeme, line_, startIndex_));
+  while (!isAtEnd_()) {
+    startIndex_ = currentIndex_;
+    scanToken_();
   }
+  tokens_.push_back(
+      Token(TokenType::EOF_, "", line_, startIndex_)); // close with eof token
+
+  return tokens_;
 }
 
 void Scanner::scanToken_() {
@@ -94,6 +87,18 @@ void Scanner::scanToken_() {
   case '*':
     addToken_(TokenType::STAR);
     break;
+  case '!':
+    addToken_(match_('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
+    break;
+  case '<':
+    addToken_(match_('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+    break;
+  case '>':
+    addToken_(match_('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+    break;
+  case '=':
+    addToken_(match_('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+    break;
   case '\n':
     line_++;
     break;
@@ -104,19 +109,37 @@ void Scanner::scanToken_() {
   }
 }
 
-std::deque<Token> Scanner::scanTokens() {
+char Scanner::advance_() {
+  return sourceText_[currentIndex_++]; // returns original value then
+                                       // increments; diff from ++currentIndex_
+}
 
-  while (!(currentIndex_ >=
-           sourceText_.length())) { // while not at the end of the source code
-    startIndex_ = currentIndex_;
-    scanToken_();
+bool Scanner::isAtEnd_() { return currentIndex_ >= sourceText_.length(); }
+
+bool Scanner::match_(char expected) {
+  if (isAtEnd_() || sourceText_[currentIndex_] != expected) {
+    return false;
   }
+  currentIndex_++;
+  return true;
+}
 
-  // close with EOF token
-  Token endToken = Token(TokenType::EOF_, "", line_, startIndex_);
-  tokens_.push_back(endToken);
+void Scanner::addToken_(TokenType tokenType) {
+  std::optional<std::string> noInput = std::nullopt;
+  addToken_(tokenType, noInput);
+}
 
-  return tokens_;
+void Scanner::addToken_(TokenType tokenType,
+                        std::optional<std::string> maybeLiteral) {
+  int lexemeLength = currentIndex_ - startIndex_;
+  [[maybe_unused]] std::string lexeme =
+      sourceText_.substr(startIndex_, lexemeLength);
+  if (maybeLiteral.has_value()) {
+    std::string literal = maybeLiteral.value();
+    tokens_.push_back(Token(tokenType, literal, line_, startIndex_));
+  } else {
+    tokens_.push_back(Token(tokenType, lexeme, line_, startIndex_));
+  }
 }
 
 } // namespace xlox

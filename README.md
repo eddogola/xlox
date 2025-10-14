@@ -6,4 +6,5 @@ I am following the course, "Crafting Interpreters". This project implements the 
 
 So far, we can:
  * Read a .x file into memory
- * Parse the tokens: (, ), \[, \], ", "
+ * Parse single char lexemes into tokens: (, ), \[, \], ", "
+ * Parse single char lexemes with possible two-char combinations: '<', '<=', '>', '>=', '=', '=='  

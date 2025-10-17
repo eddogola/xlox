@@ -102,11 +102,39 @@ void Scanner::scanToken_() {
   case '\n':
     line_++;
     break;
+  case '/':
+    if (match_('/')) {
+      while (peek_() != '\n') {
+        advance_();
+      }
+    } else {
+      addToken_(TokenType::SLASH);
+    }
+    break;
+  case '"': {
+    int length = 0;
+    while (peek_() != '"' && !isAtEnd_()) {
+      length++;
+      advance_();
+    }
+    if (isAtEnd_()) {
+      error("Unterminated string", line_);
+    }
+    advance_();
+    addToken_(TokenType::STRING, sourceText_.substr(startIndex_ + 1, length));
+  } break;
   default:
     std::string message = std::format("Token '{}' could not be processed", c);
     error(message, line_);
     break;
   }
+}
+
+char Scanner::peek_() {
+  if (!isAtEnd_()) {
+    return sourceText_[currentIndex_];
+  }
+  return '\0';
 }
 
 char Scanner::advance_() {

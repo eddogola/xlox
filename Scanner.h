@@ -26,6 +26,7 @@ public:
 
 private:
   void scanToken_();
+  char peek_();
   bool isAtEnd_();
   char advance_();
   bool match_(char c);

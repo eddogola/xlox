@@ -110,7 +110,19 @@ void Scanner::scanToken_() {
     } else {
       addToken_(TokenType::SLASH);
     }
-
+    break;
+  case '"': {
+    int length = 0;
+    while (peek_() != '"' && !isAtEnd_()) {
+      length++;
+      advance_();
+    }
+    if (isAtEnd_()) {
+      error("Unterminated string", line_);
+    }
+    advance_();
+    addToken_(TokenType::STRING, sourceText_.substr(startIndex_ + 1, length));
+  } break;
   default:
     std::string message = std::format("Token '{}' could not be processed", c);
     error(message, line_);
@@ -120,10 +132,9 @@ void Scanner::scanToken_() {
 
 char Scanner::peek_() {
   if (!isAtEnd_()) {
-    int nextIndex = currentIndex_ + 1;
-    return sourceText_[nextIndex];
+    return sourceText_[currentIndex_];
   }
-  return '\0'; // TODO: this is a bad idea eddy, think of how to fail safer
+  return '\0';
 }
 
 char Scanner::advance_() {

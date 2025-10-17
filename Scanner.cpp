@@ -102,11 +102,28 @@ void Scanner::scanToken_() {
   case '\n':
     line_++;
     break;
+  case '/':
+    if (match_('/')) {
+      while (peek_() != '\n') {
+        advance_();
+      }
+    } else {
+      addToken_(TokenType::SLASH);
+    }
+
   default:
     std::string message = std::format("Token '{}' could not be processed", c);
     error(message, line_);
     break;
   }
+}
+
+char Scanner::peek_() {
+  if (!isAtEnd_()) {
+    int nextIndex = currentIndex_ + 1;
+    return sourceText_[nextIndex];
+  }
+  return '\0'; // TODO: this is a bad idea eddy, think of how to fail safer
 }
 
 char Scanner::advance_() {
